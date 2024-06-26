@@ -67,17 +67,7 @@ pub const String = struct {
     }
 
     pub fn equals_to(self: *const String, s: *const String) bool {
-        if (self._len != s._len) {
-            return false;
-        }
-
-        var i: usize = 0;
-        while (i < self._len) : (i += 1) {
-            if (self._items[i] != s._items[i]) {
-                return false;
-            }
-        }
-        return true;
+        return self.equals_to_raw(s._items);
     }
 
     pub fn append_raw(self: *String, s: []const u8) *String {
@@ -99,7 +89,7 @@ pub const String = struct {
         const capacity = (self._capacity + s._capacity) * 2;
         var str = String.new(self._allocator, capacity);
         _ = str.append(self).append(s);
-        self._allocator.free(self._items);
+        self.deinit();
         self._items = str._items;
         self._len = str._len;
         self._capacity = str._capacity;
