@@ -77,8 +77,8 @@ pub const String = struct {
     }
 
     pub fn append_raw(self: *String, s: []const u8) *String {
-        const str = String.fromRaw(self._allocator, s);
-        self.append(str);
+        const str = &String.from_raw(self._allocator, s);
+        _ = self.append(str);
         self._allocator.free(str._items);
         return self;
     }
