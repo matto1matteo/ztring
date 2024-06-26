@@ -34,6 +34,10 @@ pub const String = struct {
         };
     }
 
+    pub fn deinit(self: String) void {
+        self._allocator.free(self._items);
+    }
+
     pub fn empty(allocator: ?Allocator) String {
         return Self.new(allocator, 0);
     }
