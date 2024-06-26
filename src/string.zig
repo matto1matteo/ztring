@@ -136,25 +136,31 @@ pub const String = struct {
 
 test "create functionality" {
     const s: String = String.new(null, 10);
+    defer s.deinit();
     assert(s._capacity == 10);
     assert(s._len == 0);
 
     const empty = String.empty(null);
+    defer empty.deinit();
     assert(empty._capacity == 0);
     assert(empty._len == 0);
 
     const sRaw: String = String.from_raw(null, "Hello");
+    defer sRaw.deinit();
     assert(sRaw._capacity == 10);
     assert(sRaw._len == 5);
 
     var henlo = String.from_raw(null, "hello");
+    defer henlo.deinit();
     const toAppend = String.from_raw(null, "a longer string");
+    defer toAppend.deinit();
     _ = henlo.append(&toAppend);
     assert(henlo._len == 5 + toAppend._len);
 }
 
 test "getters" {
     const s = String.from_raw(null, "henloooo");
+    defer s.deinit();
     _ = s.at(10000) catch |err| {
         assert(err == StringError.OutOfBound);
     };
@@ -162,5 +168,19 @@ test "getters" {
     assert(e == 'h');
 
     var s1 = try s.substring(1, 3);
+    defer s1.deinit();
     assert(s1.equals_to_raw("en"));
+}
+
+test "appends" {
+    var s = String.from_raw(testing.allocator, "");
+    defer s.deinit();
+    _ = s.append_raw("mele");
+
+    assert(s.equals_to_raw("mele"));
+
+    var s2 = &String.from_raw(testing.allocator, " e pere");
+    defer s2.deinit();
+    _ = s.append(s2);
+    assert(s.equals_to_raw("mele e pere"));
 }
